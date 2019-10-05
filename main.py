@@ -2,16 +2,16 @@ import os
 import csv
 
 #Declares Variables
+great_change = 0
+least_change = 0
 count = 0
-candidates = []
-votes = []
-percentage = []
-most = 0
-large = 0
+sum_change = 0
+total = 0
+first = False
 
 #Locates csv file to read
-filepath="C:\\Users\\Thomas Byrne\\Documents\\GitHub\\python-challenge\\PyPoll"
-csvpath = os.path.join(filepath, "election_data.csv")
+filepath="C:\\Users\\Thomas Byrne\\Documents\\GitHub\\python-challenge\\PyBank"
+csvpath = os.path.join(filepath, "budget_data.csv")
 
 #Reads values from file
 with open(csvpath, 'r', newline="") as csvfile:
@@ -19,56 +19,49 @@ with open(csvpath, 'r', newline="") as csvfile:
 
     for row in csvreader:
 
-        if row[0] == 'Voter ID':
+        #Skips header row
+        if row[0] == 'Date':
             continue
-        elif row[2] not in candidates:
-            candidates.append(row[2])
-            votes.append(1)
-        elif row[2] in candidates:
-            index = candidates.index(row[2])
-            votes[index] = votes[index] + 1
+        elif first == True:
+            #Records change from last Profit/Loss
+            change = int(row[1]) - last
+            sum_change = sum_change + change
+            #Records Greatest and Lowest Change values
+            if change > great_change:
+                great_change = change
+                great_time = row[0]
+            elif change < least_change:
+                least_change = change
+                least_time = row[0]
 
+        #Sums total
+        total = total + int(row[1])
+
+        #Counts each month
         count = count + 1
 
-    for num in votes:
-        if num > large:
-            large = num
-            winner = candidates[votes.index(num)]
+        #Records value for future use
+        last = int(row[1])
+        first = True
 
-percentage.append(votes[0]/count)
-percentage.append(votes[1]/count)
-percentage.append(votes[2]/count)
-percentage.append(votes[3]/count)
+#Calculating Average Change
+avg_change = sum_change / count
 
-ki = candidates.index('Khan')
-ci = candidates.index('Correy')
-ti = candidates.index("O'Tooley")
-li = candidates.index('Li')
-
-print("Election Results")
+print("Financial Analysis")
 print("----------------------------")
-print(f"Total Votes: {count}")
-print("----------------------------")
-print("Khan: {:.2%} ({})".format(percentage[ki], votes[ki]))
-print("O\'Tooley: {:.2%} ({})".format(percentage[ti], votes[ti]))
-print("Coorey: {:.2%} ({})".format(percentage[ci], votes[ci]))
-print("Li: {:.2%} ({})".format(percentage[li], votes[li]))
-print("----------------------------")
-print(f"Winner: {winner}")
-print("----------------------------")
+print(f"Total Months: {count}")
+print("Average Change: ${:+.2f}".format(avg_change))
+print("Greatest Increase in Profit/Loss: {} (${:.2f})".format(great_time, great_change))
+print("Greatest Decrease in Profit/Loss: {} (${:+.2f})".format(least_time, least_change))
+print("\n")
 
 output_path = os.path.join(filepath, "myfile.txt")
 
 with open(output_path, 'w') as txtfile:
 
-    txtfile.write("Election Results\n")
+    txtfile.write("Financial Analysis\n")
     txtfile.write("----------------------------\n")
-    txtfile.write(f"Total Votes: {count}\n")
-    txtfile.write("----------------------------\n")
-    txtfile.write("Khan: {} ({})\n".format(percentage[ki], votes[ki]))
-    txtfile.write("O\'Tooley: {} ({})\n".format(percentage[ti], votes[ti]))
-    txtfile.write("Coorey: {} ({})\n".format(percentage[ci], votes[ci]))
-    txtfile.write("Li: {} ({})\n".format(percentage[li], votes[li]))
-    txtfile.write("----------------------------\n")
-    txtfile.write(f"Winner: {winner}\n")
-    txtfile.write("----------------------------\n")
+    txtfile.write(f"Total Months: {count}\n")
+    txtfile.write("Average Change: {:.2f}\n".format(avg_change))
+    txtfile.write("Greatest Increase in Profit/Loss: {} ({:+.2f})\n".format(great_time, great_change))
+    txtfile.write("Greatest Decrease in Profit/Loss: {} ({:+.2f})\n".format(least_time, least_change))
